@@ -44,19 +44,12 @@ func main(){
 	s.Shutdown(tc)
 }
 /*
-Notes:
-Todays: How to build RESTful services
+Epsiode4 Notes:
+RESTful principles.
+REST is useful for microservices.
 
-REST is specific
-JSON over http
+POST new resources
+PUT to update resources
 
-You do not need to use JSON, but its just commonly used.
-JSON easy serialized and a commonly available and supported format.
-
-Two main ways to use the encoding/json packages.
-
-Struct tags, allows you to format json output.
-Write direct so we do not have to buffer into memory.
-Encoder is a bit faster, adds up when threading.
 
 */

@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/mux"
 	"strconv"
 	"context"
+	"fmt"
 )
 
 type Products struct{
@@ -70,8 +71,19 @@ func (p Products) MiddlewareValidateProduct(next http.Handler) http.Handler{
 	
 		err := prod.FromJSON(r.Body)
 		if err != nil {
-			http.Error(rw, "Unable to unmarshal json", http.StatusBadRequest)
+			http.Error(rw, "Error reading product", http.StatusBadRequest)
 			return 
+		}
+
+		//Validate the product
+		err = prod.Validate()
+		if err != nil{
+			http.Error(
+				rw,
+				fmt.Sprintf("Error validating product: %s", err),
+				http.StatusBadRequest,
+			)
+			return 	
 		}
 
 		ctx := context.WithValue( r.Context(), KeyProduct{}, prod)

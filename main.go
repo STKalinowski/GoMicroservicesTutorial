@@ -12,7 +12,6 @@ import (
 
 func main(){
 	l := log.New(os.Stdout, "product-api", log.LstdFlags)
-	
 	//Handlers
 	ph := handlers.NewProduct(l)
 
@@ -53,12 +52,12 @@ func main(){
 	l.Println("Recieved terminate, graceful shutdown", sig)
 	tc,_ := context.WithTimeout(context.Background(), 30*time.Second)
 	s.Shutdown(tc)
+
+
 }
 /*
-Epsiode5 Notes:
-
-Using Gorilla framework. 
-It should help with making the Mux and handling requests.
+Epsiode6 Notes:
+Validation done with tags.
 
 
 */

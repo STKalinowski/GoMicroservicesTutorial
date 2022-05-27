@@ -5,29 +5,46 @@ import (
 	"os"
 	"os/signal"
 	"./handlers"
+	"./data"
 	"time"
 	"context"
 	"github.com/gorilla/mux"
+	"github.com/go-openapi/runtime/middleware"
 )
 
 func main(){
 	l := log.New(os.Stdout, "product-api", log.LstdFlags)
-	//Handlers
-	ph := handlers.NewProduct(l)
+	v := data.NewValidation()
 
+	//Handlers
+	ph := handlers.NewProducts(l, v)
+
+	//Create New Mux
 	sm := mux.NewRouter()
 
 	getRouter := sm.Methods(http.MethodGet).Subrouter()
-	getRouter.HandleFunc("/", ph.GetProducts)
+	getRouter.HandleFunc("/products", ph.ListAll)
+	getRouter.HandleFunc("/products/{id:[0-9]+}", ph.ListSingle)
 
 	putRouter := sm.Methods(http.MethodPut).Subrouter()
-	putRouter.HandleFunc("/{id:[0-9]+}", ph.UpdateProducts)
+	putRouter.HandleFunc("/products", ph.Update)
 	putRouter.Use(ph.MiddlewareValidateProduct)
 
 	postRouter := sm.Methods(http.MethodPost).Subrouter()
-	postRouter.HandleFunc("/", ph.AddProduct)
+	postRouter.HandleFunc("/products", ph.Create)
 	postRouter.Use(ph.MiddlewareValidateProduct)
-	
+
+	deleteRouter := sm.Methods(http.MethodDelete).Subrouter()
+	deleteRouter.HandleFunc("/products/{id:[0-9]+}", ph.Delete)
+
+	//Handler for documentation
+	opts := middleware.RedocOpts{SpecURL: "/swagger.yaml"}
+	sh := middleware.Redoc(opts, nil)
+
+	getRouter.Handle("/docs", sh)
+	getRouter.Handle("/swagger.yaml", http.FileServer(http.Dir("./")))
+
+	//Create Server
 	s := &http.Server{
 		Addr: ":9090",
 		Handler: sm,
@@ -56,8 +73,10 @@ func main(){
 
 }
 /*
-Epsiode6 Notes:
-Validation done with tags.
+Epsiode7 Notes:
+Swagger is a openapi spec, fro docuemntation?
+Its an API tool
+Add documentation to go code and it be automatically generated.
 
 
 */
